@@ -96,6 +96,7 @@ def slideTo(X,Y):
 			tempX = canvas.penX
 			tempY = canvas.penY
 			
+			#speed values reflect delay time; lower == faster
 			max_speed = 50
 			base_speed = 1500
 			speed = base_speed
