@@ -30,34 +30,30 @@ class Plotter:
 		
 		dist = int(math.sqrt(pow(xDiff,2)+pow(yDiff,2)))
 	
-	if(dist > 0):
+		xStep = xDiff/dist
+		yStep = yDiff/dist
 		
-			xStep = xDiff/dist
-			yStep = yDiff/dist
+		#speed values reflect delay time; lower == faster
+		max_speed = 50
+		min_speed = 1500
+		ramp = 5000
+		
+		for i in range(dist):
+			self.penX += xStep
+			self.penY += yStep
 			
-			#speed values reflect delay time; lower == faster
-			max_speed = 50
-			min_speed = 1500
-			ramp = 5000
-			
-			for i in range(dist):
-				self.penX += xStep
-				self.penY += yStep
+			if(i<ramp and i<dist/2):
+				#ramp up
+				speed = (cos(PI/ramp*i)*0.5+0.5)*(min_speed-max_speed)+max_speed
 				
-				if(i<ramp and i<dist/2):
-					#ramp up
-					speed = (cos(PI/ramp*i)*0.5+0.5)*(min_speed-max_speed)+max_speed
-					
-				elif(i<dist-ramp):
-					#cruise
-					speed = max_speed
-				else:
-					#ramp down
-					speed = (cos(PI/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
+			elif(i<dist-ramp):
+				#cruise
+				speed = max_speed
+			else:
+				#ramp down
+				speed = (cos(PI/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
 
-				
-					
-				self.polarTranslate(self.penX, self.penY, speed)
+			self.polarTranslate(self.penX, self.penY, speed)
 				
 # 			self.penX = X
 # 			self.penY = Y
@@ -70,10 +66,10 @@ class Plotter:
 		#move each motor independently 
 		#calculate distance each length needs to change
 		
-		tgt = dist(self.motorL, X, Y)
+		tgt = int(dist(self.motorL, X, Y))
 		self.motorL.lengthTo(tgt,SP)
 		
-		tgt = dist(self.motorR, X, Y)
+		tgt = int(dist(self.motorR, X, Y))
 		self.motorR.lengthTo(tgt,SP)
 		
 
@@ -96,7 +92,7 @@ class Motor:
 		
 	
 	def lengthTo(self, LEN, SPEED):
-		diff = math.floor(LEN - self.length)
+		diff = LEN - self.length
 		step = 1
 
 # 		print("moving by:")
@@ -120,10 +116,10 @@ class Motor:
 				self.direction.value = False 
 		
 # 		print("number of steps");print(diff)
-		if diff>1:
-			for e in range(diff):
-				self.step(SPEED) 
-				self.length += step
+
+		for e in range(diff):
+			self.step(SPEED) 
+			self.length += step
 				
 
 	def step(self, DELAY):
