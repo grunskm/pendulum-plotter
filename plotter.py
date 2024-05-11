@@ -1,5 +1,8 @@
 # motors mounted 55in apart at 1080 steps/inch (currently 1010 steps/in) 
 
+# ideas to test accuracy:
+# use base functions independently + record position
+
 import time
 import math
 import sys
@@ -25,36 +28,41 @@ class Plotter:
 		xDiff = X - self.penX
 		yDiff = Y - self.penY
 		
-		dist = math.floor(math.sqrt(pow(xDiff,2)+pow(yDiff,2)))
-		if(dist > 0):
+		dist = int(math.sqrt(pow(xDiff,2)+pow(yDiff,2)))
+	
+	if(dist > 0):
 		
 			xStep = xDiff/dist
 			yStep = yDiff/dist
 			
 			#speed values reflect delay time; lower == faster
 			max_speed = 50
-			base_speed = 1500
-			speed = base_speed
-			
-			acc = 1.01
-			limit = 0
+			min_speed = 1500
+			ramp = 5000
 			
 			for i in range(dist):
 				self.penX += xStep
 				self.penY += yStep
 				
-				if(speed>max_speed and i<(dist/2)):
-					speed = speed/acc
-					limit = i
-				elif(i>(dist-limit) and speed<base_speed):
-					speed = speed*acc
+				if(i<ramp and i<dist/2):
+					#ramp up
+					speed = (cos(PI/ramp*i)*0.5+0.5)*(min_speed-max_speed)+max_speed
 					
-				self.polarTranslate(self.penX, self.penY,speed)
+				elif(i<dist-ramp):
+					#cruise
+					speed = max_speed
+				else:
+					#ramp down
+					speed = (cos(PI/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
+
 				
-			self.penX = X
-			self.penY = Y
-			
-			self.polarTranslate(self.penX,self.penY,speed)
+					
+				self.polarTranslate(self.penX, self.penY, speed)
+				
+# 			self.penX = X
+# 			self.penY = Y
+# 			
+# 			self.polarTranslate(self.penX,self.penY,speed)
 
 				
 
