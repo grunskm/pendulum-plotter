@@ -12,16 +12,14 @@ import board
 class Plotter:
 	def __init__(self, SEP, LEN):
 
-		self.penX = 0
-		self.penY = 0
-		self.width = int(SEP)
+		self.penX = 0.0
+		self.penY = 0.0
+		self.width = float(SEP)
 
-		motorY = int(math.sqrt(pow(LEN,2)-pow(SEP/2,2)))
+		motorY = math.sqrt(float(LEN)**2-(self.width/2)**2)
 
-		self.motorL = Motor(-SEP/2,-motorY, board.D26, board.D19, 1, LEN)
-		self.motorR = Motor( SEP/2,-motorY, board.D20, board.D16,-1, LEN)
-		
-		
+		self.motorL = Motor(-SEP/2,-motorY, board.D26, board.D19, 1, float(LEN))
+		self.motorR = Motor( SEP/2,-motorY, board.D20, board.D16,-1, float(LEN))
 		
 	def moveTo(self, X, Y):	
 	
@@ -33,34 +31,33 @@ class Plotter:
 	
 		# calculates series of points between current and future pen position
 
-		xDiff = X - self.penX
-		yDiff = Y - self.penY
+		xDiff = float(X) - self.penX
+		yDiff = float(Y) - self.penY
 		
-		dist = math.sqrt(pow(xDiff,2)+pow(yDiff,2))/4
+		dist = math.sqrt(xDiff**2+yDiff**2))/4.0
 		if(dist == 0): return
 		
-		print("distance: ")
-		print(dist)
+		print("distance: ", dist)
 		
 		xStep = xDiff/dist
 		yStep = yDiff/dist
 		
 		for i in range(int(dist)):
-			x = xStep*i
-			y = yStep*i
+			x = xStep * i + self.penX
+			y = yStep * i + self.penY
 			
-			if(i<ramp and i<dist/2):
+			if i<ramp and i<dist/2:
 				#ramp up
 				speed = (math.cos(math.pi/ramp*i)*0.5+0.5)*(min_speed-max_speed)+max_speed
 				
-			elif(i<dist-ramp):
+			elif i<dist-ramp:
 				#cruise
 				speed = max_speed
 			else:
 				#ramp down
 				speed = (math.cos(math.pi/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
 
-			#self.polarTranslate(x+self.penX, y+self.penY, speed)
+			self.polarTranslate(x+self.penX, y+self.penY, speed)
 			# print(x)
 			# print(y)
 		
@@ -74,16 +71,16 @@ class Plotter:
 		#calculate distance each length needs to change
 		
 		tgtL = int(dist(self.motorL, X, Y))
-		self.motorL.lengthTo(tgtL,SP)
-		
 		tgtR = int(dist(self.motorR, X, Y))
-		self.motorR.lengthTo(tgtR,SP)
 		
+		self.motorL.lengthTo(tgtL,SP)
+		self.motorR.lengthTo(tgtR,SP)
 
+		
 class Motor:
 	def __init__(self, X, Y, DIR, PUL, ORIENT, LENGTH):
-		self.x = X
-		self.y = Y
+		self.x = float(X)
+		self.y = float(Y)
 		
 		self.direction = digitalio.DigitalInOut(DIR)
 		self.pulse = digitalio.DigitalInOut(PUL)
@@ -94,12 +91,12 @@ class Motor:
 		self.direction.value = False
 		self.pulse.value = False	
 		
-		self.length = LENGTH
+		self.length = float(LENGTH)
 		self.orientation = ORIENT
 		
 	
 	def lengthTo(self, LEN, SPEED):
-		diff = LEN - self.length
+		diff = float(LEN) - self.length
 		step = 1
 
 # 		print("moving by:")
@@ -138,9 +135,9 @@ class Motor:
 
     
 def dist(POINT_OBJ,TGT_X,TGT_Y):
-	xDiff = TGT_X-POINT_OBJ.x
-	yDiff = TGT_Y-POINT_OBJ.y
-	d = math.sqrt(pow(xDiff,2)+pow(yDiff,2))
+	xDiff = float(TGT_X)-POINT_OBJ.x
+	yDiff = float(TGT_Y)-POINT_OBJ.y
+	d = math.sqrt(xDiff**2+yDiff**2)
 	return d
 	
 
