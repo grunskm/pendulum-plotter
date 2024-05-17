@@ -24,9 +24,9 @@ class Plotter:
 	def moveTo(self, X, Y):	
 	
 		#speed values reflect delay time; lower == faster
-		max_speed = 100
-		min_speed = 1000
-		ramp = 500
+		max_speed = 300
+		min_speed = 1200
+		ramp = 200
 		speed = min_speed
 	
 		# calculates series of points between current and future pen position
@@ -34,7 +34,7 @@ class Plotter:
 		xDiff = float(X) - self.penX
 		yDiff = float(Y) - self.penY
 		
-		dist = math.sqrt(xDiff**2+yDiff**2))/4.0
+		dist = math.sqrt(xDiff**2+yDiff**2)/2.0
 		if(dist == 0): return
 		
 		print("distance: ", dist)
@@ -57,7 +57,7 @@ class Plotter:
 				#ramp down
 				speed = (math.cos(math.pi/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
 
-			self.polarTranslate(x+self.penX, y+self.penY, speed)
+			self.polarTranslate(x, y, speed)
 			# print(x)
 			# print(y)
 		
@@ -119,7 +119,7 @@ class Motor:
 		
 # 		print("number of steps");print(diff)
 
-		for e in range(abs(diff)):
+		for e in range(abs(int(diff))):
 			self.step(SPEED) 
 			self.length += step
 				

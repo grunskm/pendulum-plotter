@@ -29,20 +29,20 @@ while True:
 	# print("Right Motor Length: ")
 	# print(plot.motorR.length)
 
-	# print("move to: ")
-	# x = int(input())
-	# y = int(input())
+	print("move to: ")
+	x = int(input())
+	y = int(input())
 	
-	count += 1
-	if count > 200:
-		break
-		
-	x = random.randint(-2000,2000)
-	y = random.randint(-2000,2000)
-	
-	print("moving to: ")
-	print(x)
-	print(y)
+# 	count += 1
+# 	if count > 20:
+# 		break
+# 		
+# 	x = random.randint(-9000,9000)
+# 	y = random.randint(-9000,9000)
+# 	
+# 	print("moving to: ")
+# 	print(x)
+# 	print(y)
 
 	plot.moveTo(x,y)
 	time.sleep(1)
