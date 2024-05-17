@@ -26,8 +26,8 @@ class Plotter:
 	def moveTo(self, X, Y):	
 	
 		#speed values reflect delay time; lower == faster
-		max_speed = 300
-		min_speed = 1500
+		max_speed = 100
+		min_speed = 1000
 		ramp = 500
 		speed = min_speed
 	
@@ -36,7 +36,7 @@ class Plotter:
 		xDiff = X - self.penX
 		yDiff = Y - self.penY
 		
-		dist = int(math.sqrt(pow(xDiff,2)+pow(yDiff,2))/2)
+		dist = math.sqrt(pow(xDiff,2)+pow(yDiff,2))/4
 		if(dist == 0): return
 		
 		print("distance: ")
@@ -60,7 +60,7 @@ class Plotter:
 				#ramp down
 				speed = (math.cos(math.pi/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
 
-			self.polarTranslate(x+self.penX, y+self.penY, speed)
+			#self.polarTranslate(x+self.penX, y+self.penY, speed)
 			# print(x)
 			# print(y)
 		
@@ -110,21 +110,19 @@ class Motor:
 		if self.orientation <0:
 			if diff<0:
 				self.direction.value = False 
-				diff *= -1
 				step = -1
 			else:
 				self.direction.value = True 
 		else:
 			if diff<0:
 				self.direction.value = True 
-				diff *= -1
 				step = -1
 			else:
 				self.direction.value = False 
 		
 # 		print("number of steps");print(diff)
 
-		for e in range(diff):
+		for e in range(abs(diff)):
 			self.step(SPEED) 
 			self.length += step
 				

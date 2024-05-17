@@ -34,11 +34,11 @@ while True:
 	# y = int(input())
 	
 	count += 1
-	if count > 10:
+	if count > 200:
 		break
 		
-	x = random.randint(-10000,10000)
-	y = random.randint(-10000,10000)
+	x = random.randint(-2000,2000)
+	y = random.randint(-2000,2000)
 	
 	print("moving to: ")
 	print(x)
