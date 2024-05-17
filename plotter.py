@@ -6,61 +6,67 @@
 import time
 import math
 import sys
-#import digitalio
-#import board
+import digitalio
+import board
 
 class Plotter:
 	def __init__(self, SEP, LEN):
 
 		self.penX = 0
 		self.penY = 0
-		self.width = SEP
+		self.width = int(SEP)
 
-		motorY = math.sqrt(pow(LEN,2)-pow(SEP/2,2))
+		motorY = int(math.sqrt(pow(LEN,2)-pow(SEP/2,2)))
 
-#		self.motorL = Motor(-SEP/2,-motorY, board.D26, board.D19, 1, LEN)
-#		self.motorR = Motor( SEP/2,-motorY, board.D20, board.D16,-1, LEN)
+		self.motorL = Motor(-SEP/2,-motorY, board.D26, board.D19, 1, LEN)
+		self.motorR = Motor( SEP/2,-motorY, board.D20, board.D16,-1, LEN)
 		
 		
-	def moveTo(self, X, Y):
+		
+	def moveTo(self, X, Y):	
 	
 		#speed values reflect delay time; lower == faster
-		max_speed = 500
-		min_speed = 2000
-		ramp = 1000
+		max_speed = 300
+		min_speed = 1500
+		ramp = 500
+		speed = min_speed
 	
 		# calculates series of points between current and future pen position
 
 		xDiff = X - self.penX
 		yDiff = Y - self.penY
 		
-		dist = math.sqrt(pow(xDiff,2)+pow(yDiff,2))
-	
+		dist = int(math.sqrt(pow(xDiff,2)+pow(yDiff,2))/2)
+		if(dist == 0): return
+		
+		print("distance: ")
+		print(dist)
+		
 		xStep = xDiff/dist
 		yStep = yDiff/dist
 		
 		for i in range(int(dist)):
-			self.penX += xStep
-			self.penY += yStep
+			x = xStep*i
+			y = yStep*i
 			
-		#	if(i<ramp and i<dist/2):
+			if(i<ramp and i<dist/2):
 				#ramp up
-			#	speed = (math.cos(math.pi/ramp*i)*0.5+0.5)*(min_speed-max_speed)+max_speed
+				speed = (math.cos(math.pi/ramp*i)*0.5+0.5)*(min_speed-max_speed)+max_speed
 				
-		#	elif(i<dist-ramp):
+			elif(i<dist-ramp):
 				#cruise
-			#	speed = max_speed
-		#	else:
+				speed = max_speed
+			else:
 				#ramp down
-		#		speed = (math.cos(math.pi/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
+				speed = (math.cos(math.pi/ramp*(dist-i))*0.5+0.5)*(min_speed-max_speed)+max_speed
 
-			#self.polarTranslate(self.penX, self.penY, speed)
-				
-# 			self.penX = X
-# 			self.penY = Y
-# 			
-# 			self.polarTranslate(self.penX,self.penY,speed)
-
+			self.polarTranslate(x+self.penX, y+self.penY, speed)
+			# print(x)
+			# print(y)
+		
+		self.polarTranslate(X, Y, speed)	
+		self.penX = X
+		self.penY = Y
 				
 
 	def polarTranslate(self, X,Y,SP):
