@@ -104,22 +104,24 @@ class Motor:
 
 		#flip value of step based on motor orientation and direction
 		
-		if self.orientation <0:
+		if self.orientation < 0:
 			if diff<0:
 				self.direction.value = False 
+				diff *= -1
 				step = -1
 			else:
 				self.direction.value = True 
 		else:
 			if diff<0:
 				self.direction.value = True 
+				diff *= -1
 				step = -1
 			else:
 				self.direction.value = False 
 		
 # 		print("number of steps");print(diff)
 
-		for e in range(abs(int(diff))):
+		for e in range(int(diff)):
 			self.step(SPEED) 
 			self.length += step
 				
