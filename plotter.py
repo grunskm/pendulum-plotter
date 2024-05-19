@@ -9,24 +9,31 @@ import sys
 import digitalio
 import board
 
+
 class Plotter:
 	def __init__(self, SEP, LEN):
 
-		self.penX = 0.0
-		self.penY = 0.0
-		self.width = float(SEP)
+		self.penX = 0
+		self.penY = 0
+		self.width = int(SEP)
 
-		motorY = math.sqrt(float(LEN)**2-(self.width/2)**2)
+		motorY = math.sqrt(LEN**2-(self.width/2)**2)
 
-		self.motorL = Motor(-SEP/2,-motorY, board.D26, board.D19, 1, float(LEN))
-		self.motorR = Motor( SEP/2,-motorY, board.D20, board.D16,-1, float(LEN))
+		self.motorL = Motor(-self.width/2,-motorY, board.D26, board.D19, 1, int(LEN))
+		self.motorR = Motor( self.width/2,-motorY, board.D20, board.D16,-1, int(LEN))
+		
+	def polarTranslate(self, X, Y, SP):
+		tgtL = int(dist(self.motorL, X, Y))
+		tgtR = int(dist(self.motorR, X, Y))
+		self.motorR.lengthTo(tgtR,SP)
+		self.motorL.lengthTo(tgtL,SP)
 		
 	def moveTo(self, X, Y):	
 	
 		#speed values reflect delay time; lower == faster
-		max_speed = 300
-		min_speed = 1200
-		ramp = 200
+		max_speed = 100
+		min_speed = 1400
+		ramp = 300
 		speed = min_speed
 	
 		# calculates series of points between current and future pen position
@@ -34,13 +41,16 @@ class Plotter:
 		xDiff = float(X) - self.penX
 		yDiff = float(Y) - self.penY
 		
-		dist = math.sqrt(xDiff**2+yDiff**2)/2.0
+		dist = math.sqrt(xDiff**2+yDiff**2)
 		if(dist == 0): return
 		
 		print("distance: ", dist)
 		
-		xStep = xDiff/dist
-		yStep = yDiff/dist
+		xStep = float(xDiff/dist)
+		yStep = float(yDiff/dist)
+		
+		print("xStep: ", xStep)
+		print("yStep: ", yStep)
 		
 		for i in range(int(dist)):
 			x = xStep * i + self.penX
@@ -64,23 +74,17 @@ class Plotter:
 		self.polarTranslate(X, Y, speed)	
 		self.penX = X
 		self.penY = Y
-				
+		
+	 
+		
 
-	def polarTranslate(self, X,Y,SP):
-		#move each motor independently 
-		#calculate distance each length needs to change
-		
-		tgtL = int(dist(self.motorL, X, Y))
-		tgtR = int(dist(self.motorR, X, Y))
-		
-		self.motorL.lengthTo(tgtL,SP)
-		self.motorR.lengthTo(tgtR,SP)
+
 
 		
 class Motor:
 	def __init__(self, X, Y, DIR, PUL, ORIENT, LENGTH):
-		self.x = float(X)
-		self.y = float(Y)
+		self.x = X
+		self.y = Y
 		
 		self.direction = digitalio.DigitalInOut(DIR)
 		self.pulse = digitalio.DigitalInOut(PUL)
@@ -91,16 +95,16 @@ class Motor:
 		self.direction.value = False
 		self.pulse.value = False	
 		
-		self.length = float(LENGTH)
+		self.length = int(LENGTH)
 		self.orientation = ORIENT
 		
 	
 	def lengthTo(self, LEN, SPEED):
-		diff = float(LEN) - self.length
+		diff = int(LEN) - self.length 
 		step = 1
 
-# 		print("moving by:")
-# 		print(diff)
+		#print("moving by: ", diff)
+
 
 		#flip value of step based on motor orientation and direction
 		
@@ -121,14 +125,18 @@ class Motor:
 		
 # 		print("number of steps");print(diff)
 
-		for e in range(int(diff)):
+		for e in range(diff):
 			self.step(SPEED) 
 			self.length += step
+			
+		# while self.length != LEN:
+			# self.step(SPEED)
+			# self.length += step
 				
-
 	def step(self, DELAY):
 		# abort check?
 		self.pulse.value = True
+		time.sleep(DELAY*0.000001)
 		self.pulse.value = False
 		time.sleep(DELAY*0.000001)
 		

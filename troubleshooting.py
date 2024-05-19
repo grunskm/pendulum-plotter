@@ -29,9 +29,9 @@ while True:
 	# print("Right Motor Length: ")
 	# print(plot.motorR.length)
 
-	print("move to: ")
-	x = int(input())
-	y = int(input())
+# 	print("move to: ")
+# 	x = int(input())
+# 	y = int(input())
 	
 # 	count += 1
 # 	if count > 20:
