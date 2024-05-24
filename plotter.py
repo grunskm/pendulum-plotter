@@ -1,13 +1,12 @@
 # motors mounted 55in apart at 1080 steps/inch (currently 1010 steps/in) 
 
-# ideas to test accuracy:
-# use base functions independently + record position
-
 import time
 import math
 import sys
 import digitalio
+import pwmio
 import board
+from adafruit_motor import servo
 
 
 class Plotter:
@@ -16,11 +15,19 @@ class Plotter:
 		self.penX = 0
 		self.penY = 0
 		self.width = int(SEP)
+		self.penUp = 0
+		self.penDown = 50
 
 		motorY = math.sqrt(LEN**2-(self.width/2)**2)
 
 		self.motorL = Motor(-self.width/2,-motorY, board.D26, board.D19, 1, int(LEN))
 		self.motorR = Motor( self.width/2,-motorY, board.D20, board.D16,-1, int(LEN))
+		
+		pwm =  pwmio.PWMOut(board.D12, duty_cycle=2**15, frequency = 50)
+		self.pen_servo = servo.Servo(pwm)
+		self.penRaise()
+		# self.servo_val = digitalio.DigitalInOut(board.D12)
+		# self.servo_val.direction = digitalio.Direction.OUTPUT
 		
 	def polarTranslate(self, X, Y, SP):
 		tgtL = int(dist(self.motorL, X, Y))
@@ -28,13 +35,32 @@ class Plotter:
 		self.motorR.lengthTo(tgtR,SP)
 		self.motorL.lengthTo(tgtL,SP)
 		
-	def moveTo(self, X, Y):	
+	def penRaise(self):
+		print("pen down")
+		
+		self.pen_servo.angle = 0
+		
+		#p1 = self.penDown
+		#p2 = self.penUp
+		#for angle in range(0, p2, 5):
+		#	self.pen_servo.angle = angle
+		#	time.sleep(0.05)
+		
+	def penLower(self):
+		print("pen up")
+		self.pen_servo.angle = 90
+		# p1 = self.penUp
+		# p2 = self.penDown
+		# for angle in range(p1, p2, -5):
+			# self.pen_servo.angle = angle
+			# time.sleep(0.05)
 	
+	def moveTo(self, X, Y):	
 		#speed values reflect delay time; lower == faster
 		max_speed = 100
-		min_speed = 1400
-		ramp = 300
-		speed = min_speed
+		min_speed = 700
+		ramp = 500
+		speed = min_speedD12
 	
 		# calculates series of points between current and future pen position
 
