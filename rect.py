@@ -2,7 +2,7 @@ import time
 import random
 import plotter
 
-plot = plotter.Plotter(55555, 36363)
+plot = plotter.Plotter(55555, 55555)
 
 count = 0
 

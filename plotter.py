@@ -9,78 +9,108 @@ import board
 from adafruit_motor import servo
 
 
+
 class Plotter:
 	def __init__(self, SEP, LEN):
 
 		self.penX = 0
 		self.penY = 0
 		self.width = int(SEP)
-		self.penUp = 0
-		self.penDown = 50
 
-		motorY = math.sqrt(LEN**2-(self.width/2)**2)
+		motorY = -1 * math.sqrt(LEN**2-(self.width/2)**2)
 
-		self.motorL = Motor(-self.width/2,-motorY, board.D26, board.D19, 1, int(LEN))
-		self.motorR = Motor( self.width/2,-motorY, board.D20, board.D16,-1, int(LEN))
+		self.motorL = Motor(-self.width/2, motorY, board.D26, board.D19,-1, int(LEN))
+		self.motorR = Motor( self.width/2, motorY, board.D20, board.D16, 1, int(LEN))
 		
-		pwm =  pwmio.PWMOut(board.D12, duty_cycle=2**15, frequency = 50)
+		pwm =  pwmio.PWMOut(board.D12, duty_cycle=2 ** 15, frequency = 50)
 		self.pen_servo = servo.Servo(pwm)
+		
+		self.penUp = 160
+		self.penDown = 100
+		self.servoPos = self.penUp
 		self.penRaise()
-		# self.servo_val = digitalio.DigitalInOut(board.D12)
-		# self.servo_val.direction = digitalio.Direction.OUTPUT
+
+
 		
 	def polarTranslate(self, X, Y, SP):
 		tgtL = int(dist(self.motorL, X, Y))
 		tgtR = int(dist(self.motorR, X, Y))
 		self.motorR.lengthTo(tgtR,SP)
 		self.motorL.lengthTo(tgtL,SP)
+		self.penX = X
+		self.penY = Y	
+
 		
 	def penRaise(self):
-		print("pen down")
-		
-		self.pen_servo.angle = 0
-		
-		#p1 = self.penDown
-		#p2 = self.penUp
-		#for angle in range(0, p2, 5):
-		#	self.pen_servo.angle = angle
-		#	time.sleep(0.05)
+		#print("180")
+		self.pen_servo.angle = 180
+		time.sleep(0.25)
+		#for angle in range(0, 100, 20):
+			#print(angle)
+			#self.pen_servo.angle = angle
+			#time.sleep(1)
 		
 	def penLower(self):
-		print("pen up")
-		self.pen_servo.angle = 90
-		# p1 = self.penUp
-		# p2 = self.penDown
-		# for angle in range(p1, p2, -5):
-			# self.pen_servo.angle = angle
-			# time.sleep(0.05)
+		print("100")
+		self.pen_servo.angle = 120
+		time.sleep(0.25)
+		#for angle in range(100, 0, -20):
+			#print(angle)
+			#self.pen_servo.angle = anglefrom PIL import Image
+			#time.sleep(1)
+	
+	def line(self, X1, Y1, X2, Y2):
+		self.penRaise()
+		self.moveTo(X1,Y1)
+		self.penLower()
+		self.moveTo(X2,Y2)
+		self.penRaise()
+		
+		#(200,200,1000,math.PI,math.TWO_PI)
+		
+	def semiCirc(self, X,Y,RAD,START,LEN):
+		a = 0
+		x=0
+		y=0
+		while abs(a) < abs(LEN):
+			x = math.sin(a+START)*RAD+X
+			y = math.cos(a+START)*RAD+Y
+			self.moveTo(x,y)
+			if LEN < 0:
+				a -= 0.01
+			else:
+				a += 0.01
+
+
 	
 	def moveTo(self, X, Y):	
 		#speed values reflect delay time; lower == faster
 		max_speed = 100
-		min_speed = 700
-		ramp = 500
-		speed = min_speedD12
+		min_speed = 400
+		ramp = 50
+		speed = min_speed
+		orig_x = self.penX
+		orig_y = self.penY
 	
 		# calculates series of points between current and future pen position
 
-		xDiff = float(X) - self.penX
-		yDiff = float(Y) - self.penY
+		xDiff = float(X) - orig_x
+		yDiff = float(Y) - orig_y
 		
 		dist = math.sqrt(xDiff**2+yDiff**2)
 		if(dist == 0): return
 		
-		print("distance: ", dist)
+		#print("distance: ", dist)
 		
 		xStep = float(xDiff/dist)
 		yStep = float(yDiff/dist)
 		
-		print("xStep: ", xStep)
-		print("yStep: ", yStep)
+		#print("xStep: ", xStep)
+		#print("yStep: ", yStep)
 		
 		for i in range(int(dist)):
-			x = xStep * i + self.penX
-			y = yStep * i + self.penY
+			x = xStep * i + orig_x
+			y = yStep * i + orig_y
 			
 			if i<ramp and i<dist/2:
 				#ramp up
@@ -97,12 +127,7 @@ class Plotter:
 			# print(x)
 			# print(y)
 		
-		self.polarTranslate(X, Y, speed)	
-		self.penX = X
-		self.penY = Y
-		
-	 
-		
+		self.polarTranslate(X, Y, speed)
 
 
 

@@ -56,6 +56,7 @@ class Motor:
 
 	def step(self, DELAY):
 		self.pulse.value = True
+		time.sleep(DELAY*0.000001)
 		self.pulse.value = False
 		time.sleep(DELAY*0.000001)
 
@@ -64,16 +65,17 @@ motorR = Motor( board.D20, board.D16, 1)
 
 distance = 0
 
-while True:
-	len = input("enter length")
-	print("len: ");print(len)
 
-	for i in range(int(len)):
-		motorL.step(1000)
-		motorR.step(1000)
-		print(i)
-		distance += 1
-	print("distance: ");print(distance)	 
+# while True:
+	# len = input("enter length")
+	# print("len: ");print(len)
+
+	# for i in range(int(len)):
+		# motorL.step(1000)
+		# motorR.step(1000)
+		# print(i)
+		# distance += 1
+	# print("distance: ");print(distance)	 
 
 
 
