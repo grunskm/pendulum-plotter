@@ -4,12 +4,12 @@ import math
 import plotter
 from PIL import Image
 
-img = Image.open("images/rust_02.jpg")
+img = Image.open("images/texture.jpg")
 print(img.height)
 print(img.width)
 
 plot = plotter.Plotter(55555, 55555)
-scale = 5
+scale = 12
 width = img.width*scale
 height = img.height*scale
 print(width)
@@ -60,7 +60,7 @@ def moveToSquig(X, Y, DIR):
             xx = math.floor((tx-xoff)/width*(img.width-d))+(a%d)
             yy = math.floor((ty-yoff)/height*(img.height-d))+(math.floor(a/d))
             coord = xx,yy
-            amp += img.getpixel(coord)[0]
+            amp += img.getpixel(coord)[1]
             a+=1
         amp = max_amp-(amp/af/255)*max_amp
         #amp = map_range(pow(amp,2),0,max_amp*max_amp,0,max_amp)

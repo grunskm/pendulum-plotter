@@ -85,7 +85,7 @@ class Plotter:
 	
 	def moveTo(self, X, Y):	
 		#speed values reflect delay time; lower == faster
-		max_speed = 100
+		max_speed = 50
 		min_speed = 400
 		ramp = 50
 		speed = min_speed
@@ -191,9 +191,6 @@ class Motor:
 		self.pulse.value = False
 		time.sleep(DELAY*0.000001)
 		
-
-
-
     
 def dist(POINT_OBJ,TGT_X,TGT_Y):
 	xDiff = float(TGT_X)-POINT_OBJ.x
